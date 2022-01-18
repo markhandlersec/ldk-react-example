@@ -25188,8 +25188,8 @@ function compare(a, b) {
 
 },{"parse-asn1":"4Szbv","./mgf":"e2JgG","./xor":"iaxu0","bn.js":"VopIn","browserify-rsa":"e594P","create-hash":"2WyL8","./withPublic":"fFkPV","safe-buffer":"eW7r9"}],"k3tsT":[function(require,module,exports) {
 'use strict';
-var process = require("process");
 var global = arguments[3];
+var process = require("process");
 function oldBrowser() {
     throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11');
 }

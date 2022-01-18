@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import * as ldk from "lightningdevkit";
-import { ConfirmationTarget, FeeEstimator } from "lightningdevkit";
-
-const initializeFeeEstimator = () => {
-  let feeEstimator = FeeEstimator.new_impl(new FeeEstimator());
-  console.log(feeEstimator);
-};
+import { FeeEstimator } from "lightningdevkit";
+import YourFeeEstimator from "./YourFeeEstimator";
 
 const compileWasm = (pathToWasm) => {
   fetch(pathToWasm)
@@ -15,7 +11,10 @@ const compileWasm = (pathToWasm) => {
     .then((bytes) => {
       ldk
         .initializeWasmFromBinary(bytes)
-        .then(() => initializeFeeEstimator())
+        .then(() => {
+          const fee_estimator = FeeEstimator.new_impl(new YourFeeEstimator());
+          console.log(fee_estimator);
+        })
         .catch((err) => console.error(err));
     });
 };
