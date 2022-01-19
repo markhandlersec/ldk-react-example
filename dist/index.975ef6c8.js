@@ -22785,17 +22785,34 @@ var _reactDefault = parcelHelpers.interopDefault(_react);
 var _lightningdevkit = require("lightningdevkit");
 var _yourFeeEstimator = require("./YourFeeEstimator");
 var _yourFeeEstimatorDefault = parcelHelpers.interopDefault(_yourFeeEstimator);
+var _testsMjs = require("lightningdevkit/test/tests.mjs");
 var _s = $RefreshSig$();
+const initializeClasses = ()=>{
+    const fee_estimator = _lightningdevkit.FeeEstimator.new_impl(new _yourFeeEstimatorDefault.default());
+    console.log(fee_estimator);
+};
 const compileWasm = (pathToWasm)=>{
-    fetch(pathToWasm).then((response)=>{
-        return response.arrayBuffer();
-    }).then((bytes)=>{
-        _lightningdevkit.initializeWasmFromBinary(bytes).then(()=>{
-            const fee_estimator = _lightningdevkit.FeeEstimator.new_impl(new _yourFeeEstimatorDefault.default());
-            console.log(fee_estimator);
-        }).catch((err)=>console.error(err)
-        );
-    });
+    const result = _testsMjs.run_tests_web(pathToWasm);
+    try {
+        if (result) console.log("All Tests Passed!");
+        else {
+            console.log(result);
+            console.log("Some Tests Failed!");
+        }
+    } catch (e) {
+        console.log("Error occured");
+        console.error(e);
+    }
+// fetch(pathToWasm)
+//   .then((response) => {
+//     return response.arrayBuffer();
+//   })
+//   .then((bytes) => {
+//     ldk
+//       .initializeWasmFromBinary(bytes)
+//       .then(() => {})
+//       .catch((err) => console.error(err));
+//   });
 };
 const App = ()=>{
     _s();
@@ -22807,12 +22824,12 @@ const App = ()=>{
             children: "Hello World"
         }, void 0, false, {
             fileName: "src/App.js",
-            lineNumber: 29,
+            lineNumber: 44,
             columnNumber: 7
         }, undefined)
     }, void 0, false, {
         fileName: "src/App.js",
-        lineNumber: 28,
+        lineNumber: 43,
         columnNumber: 5
     }, undefined));
 };
@@ -22827,7 +22844,7 @@ $RefreshReg$(_c, "App");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","lightningdevkit":"gsSuP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./YourFeeEstimator":"bQimj"}],"gsSuP":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","lightningdevkit":"gsSuP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./YourFeeEstimator":"bQimj","lightningdevkit/test/tests.mjs":"k88Yi"}],"gsSuP":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 /** Initializes the WASM backend by calling `fetch()` on the given URI - Browser only */ parcelHelpers.export(exports, "initializeWasmWebFetch", ()=>initializeWasmWebFetch
@@ -72165,6 +72182,253 @@ class YourFeeEstimator extends _lightningdevkit.FeeEstimator {
 }
 exports.default = YourFeeEstimator;
 
-},{"lightningdevkit":"gsSuP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kn9T2","7nZVA","8lqZg"], "8lqZg", "parcelRequirea42a")
+},{"lightningdevkit":"gsSuP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k88Yi":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "run_tests_web", ()=>run_tests_web
+);
+parcelHelpers.export(exports, "run_tests_node", ()=>run_tests_node
+) //# sourceMappingURL=tests.mjs.map
+;
+var _bindingsMjs = require("../bindings.mjs");
+var _indexMjs = require("../index.mjs");
+const tests = [];
+function array_eq(a, b) {
+    return a.length == b.length && a.every((v, idx)=>v == b[idx]
+    );
+}
+tests.push(async ()=>{
+    const result = _bindingsMjs.CResult_boolLightningErrorZ_ok(true);
+    console.assert(_bindingsMjs.CResult_boolLightningErrorZ_is_ok(result));
+    console.assert(_bindingsMjs.CResult_boolLightningErrorZ_get_ok(result));
+    _bindingsMjs.CResult_boolLightningErrorZ_free(result);
+    const second_res = _bindingsMjs.CResult_boolLightningErrorZ_ok(false);
+    console.assert(_bindingsMjs.CResult_boolLightningErrorZ_is_ok(second_res));
+    console.assert(!_bindingsMjs.CResult_boolLightningErrorZ_get_ok(second_res));
+    _bindingsMjs.CResult_boolLightningErrorZ_free(second_res);
+    return true;
+});
+tests.push(async ()=>{
+    const ping = _indexMjs.Ping.constructor_new(10, 2);
+    const new_ping = _indexMjs.Ping.constructor_read(ping.write());
+    if (!(new_ping instanceof _indexMjs.Result_PingDecodeErrorZ_OK)) return false;
+    if (!new_ping.is_ok()) return false;
+    if (new_ping.res.get_byteslen() != 2) return false;
+    if (new_ping.res.get_ponglen() != 10) return false;
+    return true;
+});
+tests.push(async ()=>{
+    const outpoint = _indexMjs.OutPoint.constructor_new(new Uint8Array(32), 4);
+    const read_outpoint = _indexMjs.OutPoint.constructor_read(outpoint.write());
+    if (!(read_outpoint instanceof _indexMjs.Result_OutPointDecodeErrorZ_OK)) return false;
+    if (!read_outpoint.res.eq(outpoint)) return false;
+    if (read_outpoint.res.hash() != outpoint.hash()) return false;
+    const chan_id = read_outpoint.res.to_channel_id();
+    if (chan_id.length != 32) return false;
+    if (chan_id[31] != 4) return false;
+    return true;
+});
+tests.push(async ()=>{
+    const outpoint = _indexMjs.OutPoint.constructor_new(new Uint8Array(32), 4);
+    const read_outpoint = _indexMjs.OutPoint.constructor_read(outpoint.write());
+    if (!(read_outpoint instanceof _indexMjs.Result_OutPointDecodeErrorZ_OK)) return false;
+    if (!read_outpoint.res.eq(outpoint)) return false;
+    if (read_outpoint.res.hash() != outpoint.hash()) return false;
+    const chan_id = read_outpoint.res.to_channel_id();
+    if (chan_id.length != 32) return false;
+    if (chan_id[31] != 4) return false;
+    return true;
+});
+var seed_counter = 0;
+function get_chanman() {
+    const fee_est = _indexMjs.FeeEstimator.new_impl({
+        get_est_sat_per_1000_weight (confirmation_target) {
+            return 253;
+        }
+    });
+    var tx_broadcaster;
+    const tx_broadcasted = new Promise((resolve, reject)=>{
+        tx_broadcaster = _indexMjs.BroadcasterInterface.new_impl({
+            broadcast_transaction (tx) {
+                console.log("Tx Broadcast: " + tx);
+                resolve(tx);
+            }
+        });
+    });
+    const logger = _indexMjs.Logger.new_impl({
+        log (record) {
+            console.log(record.get_module_path() + ": " + record.get_args());
+        }
+    });
+    const persister = _indexMjs.Persist.new_impl({
+        persist_new_channel (channel_id, data, update_id) {
+            return _indexMjs.Result_NoneChannelMonitorUpdateErrZ.constructor_ok();
+        },
+        update_persisted_channel (channel_id, update, data, update_id) {
+            return _indexMjs.Result_NoneChannelMonitorUpdateErrZ.constructor_ok();
+        }
+    });
+    const chain_monitor = _indexMjs.ChainMonitor.constructor_new(_indexMjs.Option_FilterZ.constructor_none(), tx_broadcaster, logger, fee_est, persister);
+    const chain_watch = chain_monitor.as_Watch();
+    const seed = new Uint8Array(32);
+    seed.fill(seed_counter);
+    seed_counter++;
+    const keys_manager = _indexMjs.KeysManager.constructor_new(seed, BigInt(42), 42);
+    const keys_interface = keys_manager.as_KeysInterface();
+    const config = _indexMjs.UserConfig.constructor_default();
+    const params = _indexMjs.ChainParameters.constructor_new(_indexMjs.Network.LDKNetwork_Testnet, _indexMjs.BestBlock.constructor_from_genesis(_indexMjs.Network.LDKNetwork_Testnet));
+    return [
+        _indexMjs.ChannelManager.constructor_new(fee_est, chain_watch, tx_broadcaster, logger, keys_interface, config, params),
+        tx_broadcasted
+    ];
+}
+function exchange_messages(a, b) {
+    var found_msgs = true;
+    while(found_msgs){
+        const as_msgs = a.as_MessageSendEventsProvider().get_and_clear_pending_msg_events();
+        const bs_msgs = b.as_MessageSendEventsProvider().get_and_clear_pending_msg_events();
+        found_msgs = as_msgs.length != 0 || bs_msgs.length != 0;
+        for(var i = 0; i < 2; i++){
+            var to;
+            var from;
+            var msgs;
+            if (i == 0) {
+                from = a;
+                to = b;
+                msgs = as_msgs;
+            } else {
+                from = b;
+                to = a;
+                msgs = bs_msgs;
+            }
+            for(var j = 0; j < msgs.length; j++){
+                const msg = msgs[j];
+                if (msg instanceof _indexMjs.MessageSendEvent_SendOpenChannel) {
+                    if (!array_eq(msg.node_id, to.get_our_node_id())) return false;
+                    to.as_ChannelMessageHandler().handle_open_channel(from.get_our_node_id(), _indexMjs.InitFeatures.constructor_known(), msg.msg);
+                } else if (msg instanceof _indexMjs.MessageSendEvent_SendAcceptChannel) {
+                    if (!array_eq(msg.node_id, to.get_our_node_id())) return false;
+                    to.as_ChannelMessageHandler().handle_accept_channel(from.get_our_node_id(), _indexMjs.InitFeatures.constructor_known(), msg.msg);
+                } else if (msg instanceof _indexMjs.MessageSendEvent_SendFundingCreated) {
+                    if (!array_eq(msg.node_id, to.get_our_node_id())) return false;
+                    to.as_ChannelMessageHandler().handle_funding_created(from.get_our_node_id(), msg.msg);
+                } else if (msg instanceof _indexMjs.MessageSendEvent_SendFundingSigned) {
+                    if (!array_eq(msg.node_id, to.get_our_node_id())) return false;
+                    to.as_ChannelMessageHandler().handle_funding_signed(from.get_our_node_id(), msg.msg);
+                } else return false;
+            }
+        }
+    }
+    return true;
+}
+function assign_u64(arr, offset, value) {
+    arr[offset + 0] = Number(value >> BigInt(0) & BigInt(255));
+    arr[offset + 1] = Number(value >> BigInt(8) & BigInt(255));
+    arr[offset + 2] = Number(value >> BigInt(16) & BigInt(255));
+    arr[offset + 3] = Number(value >> BigInt(24) & BigInt(255));
+    arr[offset + 4] = Number(value >> BigInt(32) & BigInt(255));
+    arr[offset + 5] = Number(value >> BigInt(40) & BigInt(255));
+    arr[offset + 6] = Number(value >> BigInt(48) & BigInt(255));
+    arr[offset + 7] = Number(value >> BigInt(56) & BigInt(255));
+}
+tests.push(async ()=>{
+    const peer_a = get_chanman();
+    const peer_b = get_chanman();
+    const chan_man_a = peer_a[0];
+    const chan_man_b = peer_b[0];
+    chan_man_a.as_ChannelMessageHandler().peer_connected(chan_man_b.get_our_node_id(), _indexMjs.Init.constructor_new(_indexMjs.InitFeatures.constructor_known()));
+    chan_man_b.as_ChannelMessageHandler().peer_connected(chan_man_a.get_our_node_id(), _indexMjs.Init.constructor_new(_indexMjs.InitFeatures.constructor_known()));
+    const chan_create_err = chan_man_a.create_channel(chan_man_b.get_our_node_id(), BigInt(0), BigInt(400), BigInt(0), _indexMjs.UserConfig.constructor_default());
+    if (chan_create_err.is_ok()) return false;
+    if (!(chan_create_err instanceof _indexMjs.Result__u832APIErrorZ_Err)) return false;
+    if (!(chan_create_err.err instanceof _indexMjs.APIError_APIMisuseError)) return false;
+    if (chan_create_err.err.err != "Channel value must be at least 1000 satoshis. It was 0") return false;
+    const chan_create_res = chan_man_a.create_channel(chan_man_b.get_our_node_id(), BigInt(1000000), BigInt(400), BigInt(0), _indexMjs.UserConfig.constructor_default());
+    if (!chan_create_res.is_ok()) return false;
+    if (!exchange_messages(chan_man_a, chan_man_b)) return false;
+    const events = [];
+    const event_handler = _indexMjs.EventHandler.new_impl({
+        handle_event (event) {
+            events.push(event);
+        }
+    });
+    chan_man_a.as_EventsProvider().process_pending_events(event_handler);
+    if (events.length != 1) return false;
+    if (!(events[0] instanceof _indexMjs.Event_FundingGenerationReady)) return false;
+    // (very) manually create a funding transaction
+    const witness_pos = events[0].output_script.length + 58;
+    const funding_tx = new Uint8Array(witness_pos + 7);
+    funding_tx[0] = 2; // 4-byte tx version 2
+    funding_tx[4] = 0;
+    funding_tx[5] = 1; // segwit magic bytes
+    funding_tx[6] = 1; // 1-byte input count 1
+    // 36 bytes previous outpoint all-0s
+    funding_tx[43] = 0; // 1-byte input script length 0
+    funding_tx[44] = 255;
+    funding_tx[45] = 255;
+    funding_tx[46] = 255;
+    funding_tx[47] = 255; // 4-byte nSequence
+    funding_tx[48] = 1; // one output
+    assign_u64(funding_tx, 49, events[0].channel_value_satoshis);
+    funding_tx[57] = events[0].output_script.length; // 1-byte output script length
+    funding_tx.set(events[0].output_script, 58);
+    funding_tx[witness_pos] = 1;
+    funding_tx[witness_pos + 1] = 1;
+    funding_tx[witness_pos + 2] = 255; // one witness element of size 1 with contents 0xff
+    funding_tx[witness_pos + 3] = 0;
+    funding_tx[witness_pos + 4] = 0;
+    funding_tx[witness_pos + 5] = 0;
+    funding_tx[witness_pos + 6] = 0; // lock time 0
+    const funding_res = chan_man_a.funding_transaction_generated(events[0].temporary_channel_id, funding_tx);
+    if (!(funding_res instanceof _indexMjs.Result_NoneAPIErrorZ_OK)) return false;
+    if (!exchange_messages(chan_man_a, chan_man_b)) return false;
+    const tx_broadcasted = await peer_a[1];
+    if (!array_eq(tx_broadcasted, funding_tx)) return false;
+    return true;
+});
+async function run_tests(check_leaks) {
+    var test_runs = [];
+    for (const test of tests)test_runs.push(test());
+    const results = await Promise.all(test_runs);
+    console.log("test results: " + results);
+    const result = results.every((v)=>{
+        return v === true;
+    });
+    console.log("all tests passed: " + result);
+    if (result !== true || !check_leaks) return result;
+    const allocs_finished = new Promise((resolve, reject)=>{
+        var loop_count = 0;
+        const interval_id = setInterval(()=>{
+            const alloc_count = _bindingsMjs.getRemainingAllocationCount();
+            if (loop_count % 20 == 0) console.log("Remaining LDK allocation count: " + alloc_count);
+            // chromium with --js-flags="--expose-gc" exposes a `window.gc()` which we call if we can
+            // @ts-ignore window.gc is considered a type error in TS
+            if (typeof window !== "undefined" && typeof window.gc !== "undefined") window.gc();
+            // Note that there are currently 9 leaks in the above tests. At least some are known - look for XXX in bindings.c
+            if (alloc_count <= 10) {
+                clearInterval(interval_id);
+                _bindingsMjs.debugPrintRemainingAllocs();
+                resolve(true);
+            }
+            loop_count += 1;
+            if (loop_count > 60) {
+                clearInterval(interval_id);
+                _bindingsMjs.debugPrintRemainingAllocs();
+                resolve(false);
+            }
+        }, 500);
+    });
+    return allocs_finished;
+}
+async function run_tests_web(wasm_path, check_leaks = true) {
+    await _indexMjs.initializeWasmWebFetch(wasm_path);
+    return await run_tests(check_leaks);
+}
+async function run_tests_node(wasm_file, check_leaks = true) {
+    await _indexMjs.initializeWasmFromBinary(wasm_file);
+    return await run_tests(check_leaks);
+}
+
+},{"../bindings.mjs":"eLHXZ","../index.mjs":"gsSuP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kn9T2","7nZVA","8lqZg"], "8lqZg", "parcelRequirea42a")
 
 //# sourceMappingURL=index.975ef6c8.js.map
