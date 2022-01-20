@@ -16,6 +16,10 @@ import {
   Result__u832APIErrorZ_Err,
   APIError_APIMisuseError,
   Event_FundingGenerationReady,
+  SocketDescriptor,
+  PeerManager,
+  ChannelMessageHandler,
+  RoutingMessageHandler,
 } from "lightningdevkit";
 import YourFeeEstimator from "./init/YourFeeEstimator";
 import YourLogger from "./init/YourLogger";
@@ -25,9 +29,33 @@ import YourPersister from "./init/YourPersister";
 import YourFilter from "./init/YourFilter";
 // import YourObj from "./init/YourObj"; // not too sure how to implement this one
 import YourEventhandler from "./init/YourEventHandler";
+import YourSocketDescriptor from "./init/YourSocketDescriptor";
 import initChainMonitor from "./init/ChainMonitor";
 import initKeysManager from "./init/KeysManager";
+import YourChannelMessageHandler from "./init/YourChannelMessageHandler";
+import YourRoutingMessageHandler from "./init/YourRoutingMessageHandler";
 import { run_tests_web } from "lightningdevkit/test/tests.mjs";
+
+const getPeerManager = () => {
+  console.log("this is working...");
+  const channelMessageHandler = ChannelMessageHandler.new_impl(
+    new YourChannelMessageHandler()
+  );
+  const routingMessageHandler = RoutingMessageHandler.new_impl(
+    new YourRoutingMessageHandler()
+  );
+
+  const nodeSecret = new Uint8Array(32);
+  const ephemeralRandomData = new Uint8Array(32);
+  const peerManager = PeerManager.constructor_new(
+    channelMessageHandler,
+    routingMessageHandler,
+    nodeSecret.fill(4, 1, 3),
+    ephemeralRandomData.fill(4, 1, 3),
+    Logger.new_impl(new YourLogger())
+  );
+  return peerManager;
+};
 
 const getChannelManager = () => {
   const feeEstimator = FeeEstimator.new_impl(new YourFeeEstimator());
@@ -102,6 +130,13 @@ const testMessageExchange = async () => {
     BigInt(0),
     UserConfig.constructor_default()
   );
+  // work towards the SocketDescriptor + PeerManager integration
+  const socketDescriptor = SocketDescriptor.new_impl(
+    new YourSocketDescriptor()
+  );
+  const peerManager = getPeerManager();
+  peerManager.new_inbound_connection(socketDescriptor);
+  console.log(peerManager);
 
   if (chanCreateError.is_ok()) return false;
   if (!(chanCreateError instanceof Result__u832APIErrorZ_Err)) return false;
@@ -153,7 +188,7 @@ const testMessageExchange = async () => {
   funding_tx[witness_pos + 5] = 0;
   funding_tx[witness_pos + 6] = 0; // lock time 0
 
-  const fundingRes = chanManA.funding_transaction_generated(
+  const funding_res = chanManA.funding_transaction_generated(
     events[0].temporary_channel_id,
     funding_tx
   );
