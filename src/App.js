@@ -57,14 +57,8 @@ const getPeerManager = () => {
   return peerManager;
 };
 
-const str2ab = (str) => {
-  var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i = 0, strLen = str.length; i < strLen; i++) {
-    bufView[i] = str.charCodeAt(i);
-  }
-  return buf;
-};
+const fromHexString = (hexString) =>
+  new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
 const getChannelManager = () => {
   const feeEstimator = FeeEstimator.new_impl(new YourFeeEstimator());
@@ -144,10 +138,12 @@ const testMessageExchange = async () => {
     new YourSocketDescriptor()
   );
   const peerManager = getPeerManager();
+  const node_id = fromHexString(
+    "02f8d1cac9a74c91275e28bab7f45d68c6e877829abd22888fb3bb73565217f769"
+  );
+  console.log(node_id);
   const initial_send = peerManager.new_outbound_connection(
-    str2ab(
-      "02f8d1cac9a74c91275e28bab7f45d68c6e877829abd22888fb3bb73565217f769"
-    ),
+    node_id,
     socketDescriptor
   );
   const response = socketDescriptor.send_data(initial_send.res);
