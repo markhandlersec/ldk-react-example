@@ -153,9 +153,8 @@ const testMessageExchange = async () => {
   socket.onmessage = (event) => {
     console.log("we got something back from the socket");
     console.log(event.data);
-    const b = new Blob(event.data);
-    b.arrayBuffer().then((buffer) => {
-      const result = new UInt8Array(buffer);
+    event.data.arrayBuffer().then((buffer) => {
+      const result = new Uint8Array(buffer);
       peerManager.read_event(socketDescriptor, result);
     });
   };
