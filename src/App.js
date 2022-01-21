@@ -135,8 +135,12 @@ const testMessageExchange = async () => {
     new YourSocketDescriptor()
   );
   const peerManager = getPeerManager();
-  peerManager.new_inbound_connection(socketDescriptor);
-  console.log(peerManager);
+  const initial_send = peerManager.new_outbound_connection(
+    chanManA.get_our_node_id(),
+    socketDescriptor
+  );
+  const response = socketDescriptor.send_data(initial_send.res);
+  console.log("socket descriptor response: ", response);
 
   if (chanCreateError.is_ok()) return false;
   if (!(chanCreateError instanceof Result__u832APIErrorZ_Err)) return false;
