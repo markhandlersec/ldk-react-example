@@ -155,7 +155,11 @@ const testMessageExchange = async () => {
     console.log(event.data);
     event.data.arrayBuffer().then((buffer) => {
       const result = new Uint8Array(buffer);
-      peerManager.read_event(socketDescriptor, result);
+      const event_result = peerManager.read_event(socketDescriptor, result);
+      console.log(
+        "Printing out the results from Result_boolPeerHandleErrorZ below:"
+      );
+      console.log(event_result.res);
     });
   };
 
