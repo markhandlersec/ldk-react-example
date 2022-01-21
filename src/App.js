@@ -133,9 +133,12 @@ const testMessageExchange = async () => {
     BigInt(0),
     UserConfig.constructor_default()
   );
+
+  let socket = new WebSocket("ws://127.0.0.1:8080/proxy");
+
   // work towards the SocketDescriptor + PeerManager integration
   const socketDescriptor = SocketDescriptor.new_impl(
-    new YourSocketDescriptor()
+    new YourSocketDescriptor(socket)
   );
   const peerManager = getPeerManager();
   const node_id = fromHexString(
@@ -146,6 +149,13 @@ const testMessageExchange = async () => {
     node_id,
     socketDescriptor
   );
+
+  socket.onmessage = (event) => {
+    console.log("we got something back from the socket");
+    console.log(event.data);
+    peerManager.read_event(socketDescriptor, event.data);
+  };
+
   const response = socketDescriptor.send_data(initial_send.res);
   console.log("socket descriptor response: ", response);
 

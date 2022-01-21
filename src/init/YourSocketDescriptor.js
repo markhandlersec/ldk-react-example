@@ -1,16 +1,21 @@
 import { SocketDescriptor } from "lightningdevkit";
 
 class YourSocketDescriptor extends SocketDescriptor {
+  constructor(socket) {
+    super();
+    this.socket = socket;
+  }
+
   send_data(data, resume_read) {
     console.log("send_data has fired off successfully. DATA: " + data);
     console.log(data);
-    let socket = new WebSocket("ws://127.0.0.1:8080/proxy");
-    socket.onopen = (e) => {
+
+    this.socket.onopen = (e) => {
       console.log("websocket connection established! :) ");
-      socket.send(data);
+      this.socket.send(data);
     };
 
-    socket.onerror = (e) => {
+    this.socket.onerror = (e) => {
       console.log("websocket connection failed: " + e.message);
     };
   }
